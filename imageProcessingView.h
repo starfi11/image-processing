@@ -34,6 +34,8 @@ protected:
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
+private:
+	void DrawPalette(CDC* pDC, RGBQUAD* palette, int numColors, int originX, int originY);
 public:
 	afx_msg void OnImageprocessOpenbmpfile();
 	afx_msg void OnImageprocessSavetofile();

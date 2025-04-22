@@ -110,11 +110,25 @@ void CimageProcessingView::OnImageprocessOpenbmpfile()
 //Save to a new BMP file
 void CimageProcessingView::OnImageprocessSavetofile()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose the new BMP filename
-	CString strBmpFile = "D:\\@1.bmp";
-	SaveDIB(pFileBuf, strBmpFile);
+	if (pFileBuf == NULL)
+		return;
+
+	LPCTSTR lpszFilter = _T("BMP Files (*.bmp)|*.bmp||");
+	CFileDialog dlg(FALSE, _T("bmp"), NULL,
+		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, lpszFilter, this);
+
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	CString strBmpFile = dlg.GetPathName();
+	if (!SaveDIB(pFileBuf, strBmpFile))
+	{
+		AfxMessageBox(_T("Save failed."));
+	}
+	else
+	{
+		AfxMessageBox(_T("Saved successfully."));
+	}
 }
 
 //Display BMP file header
@@ -123,6 +137,39 @@ void CimageProcessingView::OnImageprocessDisplayfileheader()
 	if(pFileBuf == NULL) return;
 	/**/
 	DisplayHeaderMessage(pFileBuf);
+}
+
+// DrawPalette：将绘制调色板逻辑封装
+void CimageProcessingView::DrawPalette(CDC* pDC, RGBQUAD* palette, int numColors, int originX, int originY)
+{
+	int blockSize = 20;      // 每个颜色块的大小
+	int textOffset = 22;     // 块与文字之间的距离
+	int cols = 8;            // 每行几个颜色块
+
+	for (int i = 0; i < numColors; ++i)
+	{
+		int row = i / cols;
+		int col = i % cols;
+
+		RGBQUAD color = palette[i];
+		COLORREF rgb = RGB(color.rgbRed, color.rgbGreen, color.rgbBlue);
+
+		// 颜色块位置
+		CRect rect(originX + col * 150,
+			originY + row * (blockSize + textOffset),
+			originX + col * 150 + blockSize,
+			originY + row * (blockSize + textOffset) + blockSize);
+
+		CBrush brush(rgb);
+		pDC->FillRect(&rect, &brush);
+
+		// RGB数值文本
+		CString text;
+		text.Format(_T("(%3d, %3d, %3d)"), color.rgbRed, color.rgbGreen, color.rgbBlue);
+		pDC->SetTextColor(RGB(0, 0, 0));
+		pDC->SetBkMode(TRANSPARENT);
+		pDC->TextOut(rect.right + 5, rect.top, text);
+	}
 }
 
 //Display Pallete
@@ -138,8 +185,19 @@ void CimageProcessingView::OnImageprocessDisplaypalette()
 	}
 	else
 	{
-		//Here are your code
+		CDC* pDC = GetDC();  // 获取窗口设备上下文
+
+		// 图像高度作为调色板起始位置向下偏移
+		BITMAPINFOHEADER* pInfoHeader = GetDIBINFO(pFileBuf);
+		int imageHeight = pInfoHeader ? pInfoHeader->biHeight : 256;
+		int paletteStartY = imageHeight + 30;
+
+		// 调用绘制函数
+		DrawPalette(pDC, pallete, num, 10, paletteStartY);
+
+		ReleaseDC(pDC);
 	}
+
 }
 
 //Get pixel value
