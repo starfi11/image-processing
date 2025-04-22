@@ -187,7 +187,9 @@
     <ClInclude Include="imageProcessing.h" />
     <ClInclude Include="imageProcessingDoc.h" />
     <ClInclude Include="imageProcessingView.h" />
+    <ClInclude Include="InterpolationDialog.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="PixelCoordDialog.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="_GlobalCommon.h" />
@@ -196,7 +198,9 @@
     <ClCompile Include="imageProcessing.cpp" />
     <ClCompile Include="imageProcessingDoc.cpp" />
     <ClCompile Include="imageProcessingView.cpp" />
+    <ClCompile Include="InterpolationDialog.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="PixelCoordDialog.cpp" />
     <ClCompile Include="_GlobalCommon.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,8 @@
 #include "imageProcessingDoc.h"
 #include "imageProcessingView.h"
 #include "_GlobalCommon.h"
+#include "PixelCoordDialog.h"
+#include "InterpolationDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -203,54 +205,122 @@ void CimageProcessingView::OnImageprocessDisplaypalette()
 //Get pixel value
 void CimageProcessingView::OnImageprocessGetpixelvalue()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose the coordinate (x,y)
-	int x = 100;
-	int y = 100;
+	if (pFileBuf == NULL)
+	{
+		AfxMessageBox(_T("请先打开 BMP 文件。"));
+		return;
+	}
+
+	// 调用坐标输入对话框
+	CPixelCoordDialog dlg;
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	int x = dlg.m_x;
+	int y = dlg.m_y;
+
 	RGBQUAD rgb;
 	bool bGray;
-	GetPixel(pFileBuf,x,y,&rgb,&bGray);
-	char buf[100];
-	if( bGray )
-		sprintf(buf, "(%d,%d) = %d",x,y,rgb.rgbReserved);
+	GetPixel(pFileBuf, x, y, &rgb, &bGray);
+
+	CString msg;
+	if (bGray)
+		msg.Format(_T("像素 (%d, %d) = 灰度 %d"), x, y, rgb.rgbReserved);
 	else
-		sprintf(buf, "(%d,%d) = (%d,%d,%d)",x,y,rgb.rgbRed,rgb.rgbGreen,rgb.rgbBlue);
-	AfxMessageBox( buf );
+		msg.Format(_T("像素 (%d, %d) = RGB(%d, %d, %d)"), x, y, rgb.rgbRed, rgb.rgbGreen, rgb.rgbBlue);
+
+	AfxMessageBox(msg);
 }
 
 //Set pixel value
 void CimageProcessingView::OnImageprocessSetpixelvalue()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose the coordinate (x,y)
-	int x = 100;
-	int y = 100;
+	if (pFileBuf == NULL)
+	{
+		AfxMessageBox(_T("请先打开 BMP 文件。"));
+		return;
+	}
+
+	// 调用坐标输入对话框
+	CPixelCoordDialog dlg;
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	int x = dlg.m_x;
+	int y = dlg.m_y;
+
+	// 弹出颜色选择器
+	CColorDialog colorDlg;
+	if (colorDlg.DoModal() != IDOK)
+		return;
+
+	COLORREF c = colorDlg.GetColor();
 	RGBQUAD rgb;
-	rgb.rgbReserved = 255;
-	rgb.rgbRed      = 255;
-	rgb.rgbGreen    = 255;
-	rgb.rgbBlue     = 255;
-	SetPixel(pFileBuf,x,y,rgb);
+	rgb.rgbRed = GetRValue(c);
+	rgb.rgbGreen = GetGValue(c);
+	rgb.rgbBlue = GetBValue(c);
+	rgb.rgbReserved = 0;
+
+	SetPixel(pFileBuf, x, y, rgb);
+
 	Invalidate();
 	UpdateWindow();
+
+	CString msg;
+	msg.Format(_T("已设置像素 (%d, %d) 为 RGB(%d, %d, %d)"), x, y, rgb.rgbRed, rgb.rgbGreen, rgb.rgbBlue);
+	AfxMessageBox(msg);
 }
 
 //Image interpolaion
 void CimageProcessingView::OnImageprocessInerpolation()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose method (nearest or bilinear) and zoom factors
-	int newWidth  = 500;
-	int newHeight = 490;
-	char *pNewImage = ImageInterpolation(pFileBuf,newWidth,newHeight,0);
-	delete [] pFileBuf;
-	pFileBuf = pNewImage;
+	if (pFileBuf == NULL)
+	{
+		AfxMessageBox(_T("请先打开一张BMP图像。"));
+		return;
+	}
+
+	// 弹出插值参数输入对话框
+	CInterpolationDialog dlg;
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	double scaleX = dlg.m_scaleX;
+	double scaleY = dlg.m_scaleY;
+	int method = dlg.m_method;  // 0-最近邻，1-双线性
+
+	// 获取原图宽高
+	BITMAPINFOHEADER* pInfo = (BITMAPINFOHEADER*)(pFileBuf + sizeof(BITMAPFILEHEADER));
+	int orgWidth = pInfo->biWidth;
+	int orgHeight = abs(pInfo->biHeight); // 可能为负
+
+	// 计算缩放后新尺寸
+	int newWidth = (int)(orgWidth * scaleX + 0.5);
+	int newHeight = (int)(orgHeight * scaleY + 0.5);
+
+	if (newWidth <= 0 || newHeight <= 0)
+	{
+		AfxMessageBox(_T("缩放后的尺寸非法。"));
+		return;
+	}
+
+	// 调用图像缩放核心函数
+	char* pNewBuf = ImageInterpolation(pFileBuf, newWidth, newHeight, method);
+	if (!pNewBuf)
+	{
+		AfxMessageBox(_T("图像缩放失败，参数或内存分配错误！"));
+		return;
+	}
+
+	// 替换缓冲区并刷新显示
+	delete[] pFileBuf;
+	pFileBuf = pNewBuf;
 	Invalidate();
 	UpdateWindow();
+
+	AfxMessageBox(_T("图像缩放完成。"));
 }
+
 
 //Gaussian smoothing
 void CimageProcessingView::OnImageprocessGausssmooth()
