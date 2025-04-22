@@ -250,3 +250,19 @@ Group → True
 Group → False
 ```
 
+### 滤波
+
+```cpp
+char* GaussianSmooth(char* pBmpBuf, double sigma);
+char* MedianFilter(char* pBmpBuf, int windowSize);
+char* BilateralFilter(char* pBmpBuf, double sigma_d, double sigma_r);
+
+```
+
+先把三个函数写出来，然后将这三个方法的窗口整合进一个.h和.cpp，编写出对应的h/cpp，然后使用该h/cpp编写对应的view，最后完成窗口资源的创建。
+
+## _GlobalCommon.h循环引用的问题
+
+由于该.h文件没有携带#pragma once，出现循环引用时会出现一个函数签名被声明多次，而当函数签名中包含默认值时，多次声明会报错。
+
+携带上#pragma once就能解决。

@@ -8,6 +8,8 @@
 #include "_GlobalCommon.h"
 #include "PixelCoordDialog.h"
 #include "InterpolationDialog.h"
+#include "ImageFilter.h"
+#include "FilterParamDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -325,16 +327,58 @@ void CimageProcessingView::OnImageprocessInerpolation()
 //Gaussian smoothing
 void CimageProcessingView::OnImageprocessGausssmooth()
 {
+	if (!pFileBuf) return;
+	CFilterParamDialog dlg(FilterMode::Gaussian);
+	if (dlg.DoModal() == IDOK) {
+		char* newBuf = GaussianSmooth(pFileBuf, dlg.sigma);
+		if (newBuf) {
+			delete[] pFileBuf;
+			pFileBuf = newBuf;
+			Invalidate(); UpdateWindow();
+			AfxMessageBox(_T("高斯滤波完成。"));
+		}
+		else {
+			AfxMessageBox(_T("高斯滤波失败。"));
+		}
+	}
 }
 
 //Median filtering
 void CimageProcessingView::OnImageprocessMedianfilter()
 {
+	if (!pFileBuf) return;
+	CFilterParamDialog dlg(FilterMode::Median);
+	if (dlg.DoModal() == IDOK) {
+		char* newBuf = MedianFilter(pFileBuf, dlg.windowSize);
+		if (newBuf) {
+			delete[] pFileBuf;
+			pFileBuf = newBuf;
+			Invalidate(); UpdateWindow();
+			AfxMessageBox(_T("中值滤波完成。"));
+		}
+		else {
+			AfxMessageBox(_T("中值滤波失败。"));
+		}
+	}
 }
 
 //Bilateral filtering
 void CimageProcessingView::OnImageprocessBilateralfilter()
 {
+	if (!pFileBuf) return;
+	CFilterParamDialog dlg(FilterMode::Bilateral);
+	if (dlg.DoModal() == IDOK) {
+		char* newBuf = BilateralFilter(pFileBuf, dlg.sigma_d, dlg.sigma_r);
+		if (newBuf) {
+			delete[] pFileBuf;
+			pFileBuf = newBuf;
+			Invalidate(); UpdateWindow();
+			AfxMessageBox(_T("双边滤波完成。"));
+		}
+		else {
+			AfxMessageBox(_T("双边滤波失败。"));
+		}
+	}
 }
 
 //Histogram equalization

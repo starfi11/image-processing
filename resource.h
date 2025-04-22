@@ -7,13 +7,22 @@
 #define IDR_MAINFRAME                   128
 #define IDR_imageProcessingTYPE         130
 #define IDD_INTERPOLATION_DIALOG        312
+#define IDD_FILTER_PARAM_DIALOG         314
 #define IDC_EDIT_X                      1001
 #define IDC_EDIT_Y                      1002
 #define IDC_EDIT_SCALE_X                1003
 #define IDC_EDIT_SCALE_Y                1004
 #define IDC_RADIO_NEAREST               1005
-#define IDC_RADIO2                      1006
 #define IDC_RADIO_BILINEAR              1006
+#define IDC_EDIT_SIGMA                  1007
+#define IDC_STATIC_SIGMA                1008
+#define IDC_STATIC_WINDOW               1009
+#define IDC_EDIT_WINDOW                 1010
+#define IDC_EDIT_SIGMA_D                1011
+#define IDC_STATIC_SIGMA_D              1012
+#define IDC_EDIT4                       1013
+#define IDC_EDIT_SIGMA_R                1013
+#define IDC_STATIC_SIGMA_R              1014
 #define ID_IMAGEPROCESSING_OPENABMPFILE 32771
 #define ID_IMAGEPROCESSING_SAVETONEWBMP 32772
 #define ID_IMAGEPROCESSING_DISPLAYBMPFILEHEADER 32773
@@ -47,9 +56,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
+#define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32799
-#define _APS_NEXT_CONTROL_VALUE         1007
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

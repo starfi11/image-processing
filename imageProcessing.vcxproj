@@ -183,7 +183,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FilterParamDialog.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ImageFilter.h" />
     <ClInclude Include="imageProcessing.h" />
     <ClInclude Include="imageProcessingDoc.h" />
     <ClInclude Include="imageProcessingView.h" />
@@ -195,6 +197,8 @@
     <ClInclude Include="_GlobalCommon.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FilterParamDialog.cpp" />
+    <ClCompile Include="ImageFilter.cpp" />
     <ClCompile Include="imageProcessing.cpp" />
     <ClCompile Include="imageProcessingDoc.cpp" />
     <ClCompile Include="imageProcessingView.cpp" />

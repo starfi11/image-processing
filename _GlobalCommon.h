@@ -1,4 +1,5 @@
 //GlobalCommon.h
+#pragma once
 #include "afxwin.h"
 
 char    *OpenBMPfile(CString strBmpFile);
@@ -10,7 +11,7 @@ RGBQUAD *GetDIBPaletteData(char *pFileBuffer,int nEntryNumber[1]);
 int     GetImageWidth(char *pFileBuffer);
 int     GetImageHeight(char *pFileBuffer);
 int     GetColorBits(char *pFileBuffer);
-long    GetUsedColors(char *pFileBuffer);
+long    GetUsedColors(char *pFileBuffer);	
 long    GetWidthBytes(char *pFileBuffer);
 
 void    DisplayHeaderMessage(char *pBmpFileBuf);
