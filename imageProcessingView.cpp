@@ -6,6 +6,7 @@
 #include "imageProcessingDoc.h"
 #include "imageProcessingView.h"
 #include "_GlobalCommon.h"
+#include "PixelCoordDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -203,38 +204,70 @@ void CimageProcessingView::OnImageprocessDisplaypalette()
 //Get pixel value
 void CimageProcessingView::OnImageprocessGetpixelvalue()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose the coordinate (x,y)
-	int x = 100;
-	int y = 100;
+	if (pFileBuf == NULL)
+	{
+		AfxMessageBox(_T("请先打开 BMP 文件。"));
+		return;
+	}
+
+	// 调用坐标输入对话框
+	CPixelCoordDialog dlg;
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	int x = dlg.m_x;
+	int y = dlg.m_y;
+
 	RGBQUAD rgb;
 	bool bGray;
-	GetPixel(pFileBuf,x,y,&rgb,&bGray);
-	char buf[100];
-	if( bGray )
-		sprintf(buf, "(%d,%d) = %d",x,y,rgb.rgbReserved);
+	GetPixel(pFileBuf, x, y, &rgb, &bGray);
+
+	CString msg;
+	if (bGray)
+		msg.Format(_T("像素 (%d, %d) = 灰度 %d"), x, y, rgb.rgbReserved);
 	else
-		sprintf(buf, "(%d,%d) = (%d,%d,%d)",x,y,rgb.rgbRed,rgb.rgbGreen,rgb.rgbBlue);
-	AfxMessageBox( buf );
+		msg.Format(_T("像素 (%d, %d) = RGB(%d, %d, %d)"), x, y, rgb.rgbRed, rgb.rgbGreen, rgb.rgbBlue);
+
+	AfxMessageBox(msg);
 }
 
 //Set pixel value
 void CimageProcessingView::OnImageprocessSetpixelvalue()
 {
-	if(pFileBuf == NULL) return;
-	/**/
-	//Add your code to choose the coordinate (x,y)
-	int x = 100;
-	int y = 100;
+	if (pFileBuf == NULL)
+	{
+		AfxMessageBox(_T("请先打开 BMP 文件。"));
+		return;
+	}
+
+	// 调用坐标输入对话框
+	CPixelCoordDialog dlg;
+	if (dlg.DoModal() != IDOK)
+		return;
+
+	int x = dlg.m_x;
+	int y = dlg.m_y;
+
+	// 弹出颜色选择器
+	CColorDialog colorDlg;
+	if (colorDlg.DoModal() != IDOK)
+		return;
+
+	COLORREF c = colorDlg.GetColor();
 	RGBQUAD rgb;
-	rgb.rgbReserved = 255;
-	rgb.rgbRed      = 255;
-	rgb.rgbGreen    = 255;
-	rgb.rgbBlue     = 255;
-	SetPixel(pFileBuf,x,y,rgb);
+	rgb.rgbRed = GetRValue(c);
+	rgb.rgbGreen = GetGValue(c);
+	rgb.rgbBlue = GetBValue(c);
+	rgb.rgbReserved = 0;
+
+	SetPixel(pFileBuf, x, y, rgb);
+
 	Invalidate();
 	UpdateWindow();
+
+	CString msg;
+	msg.Format(_T("已设置像素 (%d, %d) 为 RGB(%d, %d, %d)"), x, y, rgb.rgbRed, rgb.rgbGreen, rgb.rgbBlue);
+	AfxMessageBox(msg);
 }
 
 //Image interpolaion
