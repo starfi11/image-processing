@@ -188,3 +188,71 @@ char* CannyEdgeDetection(char* pBmpBuf, double sigma, int lowThresh, int highThr
     return newBuf;
 }
 
+char* OtsuSegmentation(char* pBmpBuf)
+{
+    if (!pBmpBuf || GetColorBits(pBmpBuf) != 8)
+        return nullptr;
+
+    int width = GetImageWidth(pBmpBuf);
+    int height = GetImageHeight(pBmpBuf);
+    long bytesPerRow = GetWidthBytes(pBmpBuf);
+    long bufSize = GetDIBHEADER(pBmpBuf)->bfSize;
+
+    char* newBuf = new char[bufSize];
+    memcpy(newBuf, pBmpBuf, GetDIBHEADER(pBmpBuf)->bfOffBits);
+    char* dst = GetDIBImageData(newBuf);
+    char* src = GetDIBImageData(pBmpBuf);
+
+    // Step 1: 构建灰度直方图
+    int hist[256] = { 0 };
+    for (int y = 0; y < height; ++y)
+        for (int x = 0; x < width; ++x)
+            hist[(BYTE)src[y * bytesPerRow + x]]++;
+
+    // Step 2: 计算像素总数和总灰度
+    int total = width * height;
+    double sum_all = 0;
+    for (int t = 0; t < 256; ++t)
+        sum_all += t * hist[t];
+
+    // Step 3: 遍历所有阈值 t，计算类间方差
+    int threshold = 0;
+    double sum_b = 0;
+    int w_b = 0;
+    double max_var = 0;
+
+    for (int t = 0; t < 256; ++t)
+    {
+        w_b += hist[t];
+        if (w_b == 0) continue;
+
+        int w_f = total - w_b;
+        if (w_f == 0) break;
+
+        sum_b += t * hist[t];
+        double m_b = sum_b / w_b;
+        double m_f = (sum_all - sum_b) / w_f;
+
+        double var_bf = (double)w_b * w_f * (m_b - m_f) * (m_b - m_f);
+        if (var_bf > max_var)
+        {
+            max_var = var_bf;
+            threshold = t;
+        }
+    }
+
+    // Step 4: 显示最优阈值
+    CString msg;
+    msg.Format(_T("自动选出的最佳阈值为：%d"), threshold);
+    AfxMessageBox(msg);
+
+    // Step 5: 应用阈值分割
+    for (int y = 0; y < height; ++y)
+        for (int x = 0; x < width; ++x)
+        {
+            BYTE pixel = (BYTE)src[y * bytesPerRow + x];
+            dst[y * bytesPerRow + x] = (pixel >= threshold ? 255 : 0);
+        }
+
+    return newBuf;
+}

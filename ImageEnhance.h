@@ -13,3 +13,5 @@ enum EnhanceMode {
 char* HistogramEqualization(char* pBmpBuf);
 char* GradientSharpening(char* pBmpBuf, double alpha);
 char* CannyEdgeDetection(char* pBmpBuf, double sigma, int lowThresh, int highThresh);
+char* OtsuSegmentation(char* pBmpBuf);
+

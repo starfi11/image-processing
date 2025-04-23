@@ -453,4 +453,19 @@ void CimageProcessingView::OnImageprocessCannyedge()
 //Otsu segmentation
 void CimageProcessingView::OnImageprocessOtsusegment()
 {
+	if (!pFileBuf) {
+		AfxMessageBox(_T("请先打开一张BMP图像。"));
+		return;
+	}
+
+	char* newBuf = OtsuSegmentation(pFileBuf);
+	if (newBuf) {
+		delete[] pFileBuf;
+		pFileBuf = newBuf;
+		Invalidate(); UpdateWindow();
+		AfxMessageBox(_T("Otsu 分割完成。"));
+	}
+	else {
+		AfxMessageBox(_T("Otsu 分割失败。"));
+	}
 }
