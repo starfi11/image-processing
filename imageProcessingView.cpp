@@ -10,6 +10,9 @@
 #include "InterpolationDialog.h"
 #include "ImageFilter.h"
 #include "FilterParamDialog.h"
+#include "ImageEnhance.h"
+#include "EnhanceParamDialog.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -384,16 +387,67 @@ void CimageProcessingView::OnImageprocessBilateralfilter()
 //Histogram equalization
 void CimageProcessingView::OnImageprocessHistoequalization()
 {
+	if (!pFileBuf) {
+		AfxMessageBox(_T("请先打开一张BMP图像。"));
+		return;
+	}
+
+	char* newBuf = HistogramEqualization(pFileBuf);
+	if (newBuf) {
+		delete[] pFileBuf;
+		pFileBuf = newBuf;
+		Invalidate(); UpdateWindow();
+		AfxMessageBox(_T("直方图均衡化完成。"));
+	}
+	else {
+		AfxMessageBox(_T("直方图均衡化失败。"));
+	}
 }
 
 //Sharpening by gradient
 void CimageProcessingView::OnImageprocessSharpengrad()
 {
+	if (!pFileBuf) {
+		AfxMessageBox(_T("请先打开一张BMP图像。"));
+		return;
+	}
+
+	CEnhanceParamDialog dlg(EnhanceMode::Sharpen);
+	if (dlg.DoModal() == IDOK) {
+		char* newBuf = GradientSharpening(pFileBuf, dlg.alpha);
+		if (newBuf) {
+			delete[] pFileBuf;
+			pFileBuf = newBuf;
+			Invalidate(); UpdateWindow();
+			AfxMessageBox(_T("图像锐化完成。"));
+		}
+		else {
+			AfxMessageBox(_T("图像锐化失败。"));
+		}
+	}
 }
 
 //Cany edge detection
 void CimageProcessingView::OnImageprocessCannyedge()
 {
+	if (!pFileBuf) {
+		AfxMessageBox(_T("请先打开一张BMP图像。"));
+		return;
+	}
+
+	CEnhanceParamDialog dlg(EnhanceMode::Canny);
+	if (dlg.DoModal() == IDOK) {
+		char* newBuf = CannyEdgeDetection(pFileBuf, dlg.sigma, dlg.lowThresh, dlg.highThresh);
+		if (newBuf) {
+			delete[] pFileBuf;
+			pFileBuf = newBuf;
+			Invalidate(); UpdateWindow();
+			AfxMessageBox(_T("Canny边缘检测完成。"));
+		}
+		else {
+			AfxMessageBox(_T("Canny边缘检测失败。"));
+		}
+	}
 }
 
 //Otsu segmentation
